@@ -3,3 +3,12 @@
 __pycache__/
 *.pyc
 .vscode/
+# PyInstaller build files
+/build/
+/dist/
+*.spec
+
+# Python virtual environment
+.venv312/
+__pycache__/
+*.py[cod]
