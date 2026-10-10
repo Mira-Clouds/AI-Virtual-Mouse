@@ -2,9 +2,9 @@
 
 # AI Virtual Mouse 🖱️🤖
 
-**Control your computer with hand gestures — no physical mouse required.**
+**Control your computer using real-time hand gestures — no physical mouse required.**
 
-A computer-vision-based virtual mouse built with **Python, OpenCV, MediaPipe, and PyAutoGUI**.
+A Python computer-vision project using OpenCV, MediaPipe, NumPy, and PyAutoGUI.
 
 </div>
 
@@ -12,115 +12,164 @@ A computer-vision-based virtual mouse built with **Python, OpenCV, MediaPipe, an
 
 ## ✨ Features
 
-- **Touchless cursor control** using your webcam.
-- **Gesture-based clicking** for left and right mouse clicks.
-- **Hand-gesture scrolling** to navigate pages.
-- **Smooth cursor movement** to help reduce jitter.
-- **Configurable tracking area and sensitivity** for a more comfortable experience.
+- **Live hand tracking** through a webcam using MediaPipe.
+- **Cursor movement** by moving the index fingertip inside the tracking rectangle.
+- **Left click** using a thumb-and-index-finger pinch.
+- **Right click** using an index-and-middle-finger pinch.
+- **Scroll up/down** by pinching the thumb and middle finger, then moving the hand vertically.
+- **Smoothed cursor movement** with adjustable responsiveness.
+- **On-screen status and gesture-distance values** to help troubleshoot tracking.
+- **PyAutoGUI failsafe** enabled for an emergency stop.
 
-## 🖐️ Gesture Control Guide
+## 🖐️ Gesture Controls
 
-Show your hand to the webcam and perform the gestures below. The exact gesture thresholds and visual feedback depend on the implementation in `hand_tracking.py`.
+| Action | Gesture | Instructions |
+|---|---|---|
+| Move cursor | Index fingertip movement | Keep your hand visible and move the index fingertip inside the rectangle shown in the camera window. |
+| Left click | Thumb + index finger pinch | Bring the thumb and index fingertip together briefly. |
+| Right click | Index + middle finger pinch | Bring the index and middle fingertips together briefly. |
+| Scroll | Thumb + middle finger pinch | Keep the thumb and middle fingertip pinched and move your hand up or down. |
+| Exit | Press `Q` | Click the camera window first if needed, then press `Q`. |
 
-| Action | Gesture | How to use it |
-|:--|:--:|:--|
-| **Move Cursor** | <img src="assets/move.png" alt="Index finger pointing up" width="110"> | Extend your index finger and move your hand to guide the cursor. |
-| **Left Click** | <img src="assets/left_click.png" alt="Thumb and index finger pinch" width="110"> | Bring your thumb and index fingertip together. |
-| **Right Click** | <img src="assets/right_click.png" alt="Index and middle finger pinch" width="110"> | Bring your index and middle fingertips together. |
-| **Scroll Up / Down** | <img src="assets/scroll.png" alt="Middle finger and thumb pinch" width="110"> | Pinch your middle finger and thumb, then move your hand up or down. |
-
-> **Note:** The images are visual guides. Make sure the gestures and thresholds in this table match the current code in your project.
+**Tip:** Keep your hand well-lit, fully visible, and within the rectangle. Avoid placing the hand too close to the camera.
 
 ## 🧰 Tech Stack
 
 - **Python** — application logic
-- **OpenCV** — webcam and image processing
-- **MediaPipe** — real-time hand landmark tracking
-- **PyAutoGUI** — operating-system mouse control
+- **OpenCV** — webcam access and image processing
+- **MediaPipe** — real-time hand landmark detection
+- **NumPy** — coordinate mapping and distance calculations
+- **PyAutoGUI** — operating-system cursor, click, and scroll control
 
-## 🚀 Installation & Setup
+## 💻 Requirements
 
-### 1. Requirements
-
-- Windows 10/11
-- Python version compatible with the packages in `requirements.txt` (Python 3.12 is recommended only if your installed MediaPipe version supports it)
+- Windows 10/11 (the camera code tries the Windows DirectShow backend first)
 - A working webcam
+- Python compatible with the versions of MediaPipe and the other packages installed in your environment
+- The packages listed in `requirements.txt`
 
-### 2. Clone this repository
+## 🚀 Installation and Setup
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Mira-Clouds/AI-Virtual-Mouse.git
 cd AI-Virtual-Mouse
 ```
 
-### 3. Create and activate a virtual environment
+### 2. Create a virtual environment
+
+In PowerShell:
 
 ```powershell
 python -m venv .venv
+```
+
+Activate it:
+
+```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks activation, you can use Command Prompt instead:
+If PowerShell does not allow activation, open Command Prompt and run:
 
 ```bat
 .venv\Scripts\activate.bat
 ```
 
-### 4. Install dependencies
+### 3. Install dependencies
 
-```bash
+```powershell
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 5. Start the application
+If the dependency installation fails, check that your Python version is supported by the MediaPipe version in your requirements file.
 
-```bash
+### 4. Run the application
+
+```powershell
 python hand_tracking.py
 ```
 
-If your main Python file has a different name or location, update the command to match your project structure.
+A webcam window named **AI Virtual Mouse** should open. Keep your hand inside the on-screen rectangle and use the gestures described above.
 
-## ⚙️ Customization
+## ⚙️ Adjusting Cursor Movement
 
-Open `hand_tracking.py` and look for the relevant settings. Names and default values may differ by implementation.
+Open `hand_tracking.py` and look near the top for these settings:
 
-| Setting | Purpose |
-|:--|:--|
-| `smooth_factor` | Controls cursor smoothing. More smoothing can feel steadier but may add lag. |
-| `click_dist` | Sets the distance threshold used to detect a pinch. |
-| `margin_x` / `margin_y` | Adjusts the active webcam tracking area. |
+| Setting | Purpose | Current value |
+|---|---|---:|
+| `SMOOTHING` | Higher values make the cursor respond faster; lower values make movement smoother but slower. | `0.60` |
+| `MARGIN_X` | Horizontal margin of the camera tracking area. | `60` |
+| `MARGIN_Y` | Vertical margin of the camera tracking area. | `45` |
+| `LEFT_PINCH_ON` / `LEFT_PINCH_OFF` | Start/release thresholds for left-click detection. | `0.32` / `0.44` |
+| `RIGHT_PINCH_ON` / `RIGHT_PINCH_OFF` | Start/release thresholds for right-click detection. | `0.32` / `0.44` |
+| `SCROLL_PINCH_ON` / `SCROLL_PINCH_OFF` | Start/release thresholds for scroll mode. | `0.35` / `0.47` |
+| `SCROLL_PIXELS_PER_STEP` | Lower values make scrolling more sensitive. | `16` |
+
+### Cursor tuning
+
+- If the cursor feels **slow**, increase `SMOOTHING` gradually, for example to `0.70`.
+- If the cursor feels **jittery**, reduce `SMOOTHING`, for example to `0.40`.
+- If the cursor cannot reach the edges of the screen, adjust `MARGIN_X` and `MARGIN_Y`.
+- Change one setting at a time and test again.
+
+The best values depend on your webcam, lighting, hand position, and screen resolution.
+
+## 🛠️ Troubleshooting
+
+### The camera does not open
+
+- Close other applications that may be using the webcam.
+- Check Windows camera permissions.
+- Confirm that the webcam is connected and working.
+- If you have multiple cameras, change `CAMERA_INDEX` in `hand_tracking.py` from `0` to `1` and try again.
+
+### The hand is detected but the cursor does not move well
+
+- Keep the index fingertip inside the tracking rectangle.
+- Improve lighting and keep the hand fully visible.
+- Adjust `SMOOTHING` and the tracking margins using the table above.
+- Make sure the correct virtual environment is active before running the script.
+
+### Gestures trigger incorrectly
+
+- Keep the camera view clear and avoid overlapping fingertips.
+- Adjust the pinch thresholds carefully in `hand_tracking.py`.
+- The camera window displays `L`, `R`, and `S` distance values to help inspect the detected finger distances.
+
+### Stop the application safely
+
+- Press `Q` while the camera window is focused.
+- PyAutoGUI's failsafe is enabled: moving the system cursor to the **top-left corner** triggers its emergency stop. Avoid disabling this safety feature.
+
+## 🔒 Privacy and Safety
+
+- The webcam is used locally for hand tracking while the application is running.
+- Close the application when you finish.
+- Test the controls carefully before using them around unsaved work or important system actions.
+- Cursor movement and clicks are sent to your operating system, so keep your hand gestures controlled.
 
 ## 📁 Project Structure
 
 ```text
 AI-Virtual-Mouse/
-├── assets/
-│   ├── move.png
-│   ├── left_click.png
-│   ├── right_click.png
-│   └── scroll.png
 ├── hand_tracking.py
-├── webcam_test.py
 ├── requirements.txt
-└── README.md
+├── README.md
+└── .venv/                 # Local virtual environment; do not commit to GitHub
 ```
 
-*The file tree above is an example. Keep only the files that actually exist in your repository.*
-
-## 🔒 Privacy & Safety
-
-- The application uses the webcam for hand tracking.
-- Tell users when the camera is active and close the application when finished.
-- Test gestures carefully before using them with important files or system controls.
+Add other files or folders to this tree if they are present in your repository. Do not commit your local virtual environment or Python cache files.
 
 ## 🤝 Contributing
 
-Contributions and suggestions are welcome. For significant changes, open an issue first to discuss the proposed improvement.
+Suggestions, bug reports, and improvements are welcome. For significant changes, open an issue before submitting a pull request.
 
 ## 📜 License
 
-This project can use the [MIT License](https://choosealicense.com/licenses/mit/) if an MIT `LICENSE` file is included in the repository.
+No license is specified here. Add a `LICENSE` file and update this section if you decide to publish the project under a particular open-source license.
 
 ---
 
